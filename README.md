@@ -1,1 +1,1 @@
-# benchmark-commandline
+# benchmark-generateprimes
