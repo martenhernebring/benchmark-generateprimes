@@ -11,12 +11,50 @@ public class BenchMark {
 
   @State(Scope.Benchmark)
   public static class Parameter {
-    public int num = Integer.MAX_VALUE;
-    public int zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, twentyFour = 24;
+    public final int num = Integer.MAX_VALUE;
+    public final int zero = 0, one = 1, two = 2, three = 3, four = 4, five = 5, six = 6, eight = 8, twentyFour = 24, fourty = 40;
+    public final BigInteger ONE = BigInteger.valueOf(1), TWO = BigInteger.valueOf(2);
+    public final int[] INTEGERS_SPRP = {7, 61};
+    public final String empty = "";
   }
 
   @Benchmark
   public static boolean PrimeTime(Parameter parameter, Blackhole blackhole) {
+    int num = parameter.num;
+    if(num < parameter.four) {
+      return num >= parameter.two;
+    }
+    if((num & parameter.one) == parameter.zero) {
+      return false;
+    }
+    int max = (int) Math.sqrt(num);
+    boolean[] notPrimes = new boolean[max];
+    if(parameter.eight < max) {
+      int findMax = (int) Math.sqrt(notPrimes.length);
+      for(int odd = parameter.three; odd <= findMax; odd = odd + parameter.two) {
+        if(!notPrimes[odd - parameter.one]) {
+          for(int i = odd * parameter.three - parameter.one; i < notPrimes.length; i = i + odd << parameter.one) {
+            notPrimes[i] = true;
+          }
+        }
+      }
+      blackhole.consume(findMax);
+    }
+    for(int i = parameter.two; i < notPrimes.length; i = i + parameter.two) {
+      if(!notPrimes[i]) {
+        if(num % (i + parameter.one) == parameter.zero) {
+          return false;
+        }
+      }
+    }
+    blackhole.consume(num);
+    blackhole.consume(max);
+    blackhole.consume(notPrimes);
+    return true;
+  }
+
+  @Benchmark
+  public static boolean PrimeTime2(Parameter parameter, Blackhole blackhole) {
     int num = parameter.num;
     if(num < parameter.four) {
       return num >= parameter.two;
@@ -56,80 +94,81 @@ public class BenchMark {
   }
 
   @Benchmark
-  public static boolean PrimeTime2(Parameter parameter) {
+  public static boolean PrimeTime3(Parameter parameter, Blackhole blackhole) {
     int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(100);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime3(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(90);
+    if(num < parameter.four) {
+      return num >= parameter.two;
+    }
+    int max = (int) Math.sqrt(num);
+    boolean[] notPrimes = new boolean[max];
+    int findMax = (int) Math.sqrt(notPrimes.length);
+    for(int n = parameter.two; n <= findMax; n++) {
+      if(!notPrimes[n - parameter.one]) {
+        for(int i = (n << parameter.one) - parameter.one; i < notPrimes.length; i = i + n) {
+          notPrimes[i] = true;
+        }
+      }
+    }
+    blackhole.consume(findMax);
+    for(int i = parameter.one; i < notPrimes.length; i++) {
+      if(!notPrimes[i]) {
+        if(num % (i + parameter.one) == parameter.zero) {
+          return false;
+        }
+      }
+    }
+    blackhole.consume(num);
+    blackhole.consume(max);
+    blackhole.consume(notPrimes);
+    return true;
   }
 
   @Benchmark
   public static boolean PrimeTime4(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(80);
+    BigInteger bi = new BigInteger(parameter.num + parameter.empty);
+    return bi.isProbablePrime(parameter.fourty);
   }
 
   @Benchmark
-  public static boolean PrimeTime5(Parameter parameter) {
+  public static boolean PrimeTime5(Parameter parameter, Blackhole blackhole) {
     int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(70);
+    if(num < parameter.four) {
+      return num >= parameter.two;
+    }
+    if(num == parameter.INTEGERS_SPRP[parameter.zero] || num == parameter.INTEGERS_SPRP[parameter.one]) {
+      return true;
+    }
+    if((num & parameter.one) == parameter.zero) {
+      return false;
+    }
+    BigInteger bi = new BigInteger(num + parameter.empty);
+    blackhole.consume(num);
+    return passesMillerRabinStrongProbablePrimeBaseForIntegers(bi, parameter, blackhole);
   }
 
-  @Benchmark
-  public static boolean PrimeTime6(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(60);
-  }
+  private static boolean passesMillerRabinStrongProbablePrimeBaseForIntegers(BigInteger biUnderTest, Parameter parameter, Blackhole blackhole) {
+    // Find a and m such that m is odd and this == 1 + 2**a * m
+    BigInteger thisMinusOne = biUnderTest.subtract(parameter.ONE);
+    BigInteger m = thisMinusOne;
+    int a = m.getLowestSetBit();
+    m = m.shiftRight(a);
 
-  @Benchmark
-  public static boolean PrimeTime7(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(50);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime8(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(40);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime9(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(30);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime10(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(20);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime11(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(10);
-  }
-
-  @Benchmark
-  public static boolean PrimeTime12(Parameter parameter) {
-    int num = parameter.num;
-    BigInteger bi = new BigInteger(num + "");
-    return bi.isProbablePrime(1);
+    // Do the tests
+    for (int i = parameter.zero; i < parameter.INTEGERS_SPRP.length; i++) {
+      int j = parameter.zero;
+      BigInteger z = new BigInteger(parameter.INTEGERS_SPRP[i] + parameter.empty).modPow(m, biUnderTest);
+      while (!((j == parameter.zero && z.equals(parameter.ONE)) || z.equals(thisMinusOne))) {
+        if (j > parameter.zero && z.equals(parameter.ONE) || ++j == a)
+          return false;
+        z = z.modPow(parameter.TWO, biUnderTest);
+      }
+      blackhole.consume(z);
+    }
+    blackhole.consume(biUnderTest);
+    blackhole.consume(thisMinusOne);
+    blackhole.consume(a);
+    blackhole.consume(m);
+    return true;
   }
 
 }
